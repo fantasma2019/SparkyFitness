@@ -143,7 +143,8 @@ function isNotFound(error: unknown) {
 
 /** Flushes a finished file to disk, so the rename never publishes a short one. */
 async function syncFile(filePath: string) {
-  const handle = await fsp.open(filePath, 'r');
+  // Windows FlushFileBuffers requires write access. r+ preserves the archive.
+  const handle = await fsp.open(filePath, 'r+');
   try {
     await handle.sync();
   } finally {

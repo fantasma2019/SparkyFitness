@@ -87,15 +87,3 @@ export const formatDayLabel = (
     timeZone: 'UTC',
   });
 };
-
-/** A weekday (0 = Sunday) as text in `locale`, e.g. "Mon". */
-export const weekdayLabel = (
-  day: number,
-  locale: string,
-  style: 'short' | 'long' = 'short'
-): string =>
-  // 2024-01-07 was a Sunday, so day 0 is Sunday.
-  new Date(Date.UTC(2024, 0, 7 + day)).toLocaleDateString(locale, {
-    weekday: style,
-    timeZone: 'UTC',
-  });

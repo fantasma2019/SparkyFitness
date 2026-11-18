@@ -136,22 +136,29 @@ function RecipeImportBrowser({
     try {
       const result = await previewRecipe({ providerId, recipeSlug });
       if (generation.current === request) setPreview(result);
-    } catch (error) {
-      if (generation.current === request)
-        setFailure(
-          error instanceof Error
-            ? error
-            : new Error(
-                t(
-                  'recipeImport.previewFailed',
-                  'The recipe could not be loaded. Try again.'
-                )
-              )
-        );
+    } catch (error: unknown) {
+      if (generation.current === request) {
+        setFailure(error instanceof Error ? error : new Error());
+      }
     } finally {
       if (generation.current === request) setBusy(false);
     }
   }
+
+  const previewError =
+    failure ?? (!initialDismissed ? initialPreview.error : null);
+  const previewErrorText =
+    previewError &&
+    'code' in previewError &&
+    previewError.code === 'RECIPE_TOO_LARGE'
+      ? t(
+          'recipeImport.tooManyIngredients',
+          'This Mealie recipe has more than 100 ingredients. Split it into smaller recipes before importing.'
+        )
+      : t(
+          'recipeImport.previewFailed',
+          'The recipe could not be loaded. Try again.'
+        );
 
   if (activePreview)
     return (
@@ -202,7 +209,14 @@ function RecipeImportBrowser({
           {t('recipeImport.loadingProviders', 'Loading providers…')}
         </p>
       )}
-      {providers.error && <p role="alert">{providers.error.message}</p>}
+      {providers.error && (
+        <p role="alert">
+          {t(
+            'recipeImport.providersFailed',
+            'Could not load recipe providers. Try again.'
+          )}
+        </p>
+      )}
       {providers.isSuccess && mealieProviders.length === 0 && (
         <p>
           {t(
@@ -254,11 +268,15 @@ function RecipeImportBrowser({
                   {t('recipeImport.loadingRecipes', 'Loading recipes…')}
                 </p>
               )}
-              {recipes.error && <p role="alert">{recipes.error.message}</p>}
-              {failure && <p role="alert">{failure.message}</p>}
-              {!initialDismissed && initialPreview.error && (
-                <p role="alert">{initialPreview.error.message}</p>
+              {recipes.error && (
+                <p role="alert">
+                  {t(
+                    'recipeImport.searchFailed',
+                    'Could not load recipes. Try again.'
+                  )}
+                </p>
               )}
+              {previewError && <p role="alert">{previewErrorText}</p>}
               <ul className="space-y-2">
                 {recipes.data?.items.map((recipe) => (
                   <li key={recipe.slug}>

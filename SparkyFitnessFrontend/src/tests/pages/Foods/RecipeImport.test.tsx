@@ -1185,7 +1185,8 @@ it('shows the actionable ingredient-limit API message without suggesting a provi
   api.previewRecipe.mockRejectedValueOnce(
     new HttpApiError(
       'This Mealie recipe has more than 100 ingredients. Split it into smaller recipes before importing.',
-      422
+      422,
+      'RECIPE_TOO_LARGE'
     )
   );
   setup();

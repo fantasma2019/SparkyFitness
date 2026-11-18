@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { useSymptomEntries, useSymptomFreeDays } from '@/hooks/useSymptoms';
 import { cn } from '@/lib/utils';
+import { weekdayLabel } from '@/utils/languageUtils';
 import { scaleMax, symptomEntryDays, todayInZone } from '@workspace/shared';
 
 interface SymptomCalendarProps {
@@ -25,8 +26,6 @@ function monthDays(year: number, month: number) {
   };
 }
 
-const WEEKDAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-
 /**
  * A month of symptom history. Days you marked symptom-free are green, days an
  * entry covers are tinted by how severe the worst one was (an episode tints
@@ -39,6 +38,7 @@ export default function SymptomCalendar({
   onDateChange,
 }: SymptomCalendarProps) {
   const { t } = useTranslation();
+  const locale = t('i18n.locale', 'en-US');
   const { timezone } = usePreferences();
   const today = todayInZone(timezone);
   const [year, setYear] = useState(() => Number(selectedDate.slice(0, 4)));
@@ -82,7 +82,7 @@ export default function SymptomCalendar({
   };
 
   const title = new Date(Date.UTC(year, month - 1, 1)).toLocaleDateString(
-    undefined,
+    locale,
     { month: 'long', year: 'numeric', timeZone: 'UTC' }
   );
 
@@ -115,9 +115,9 @@ export default function SymptomCalendar({
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="grid grid-cols-7 gap-1 text-center text-xs tabular-nums">
-          {WEEKDAYS.map((d, i) => (
+          {Array.from({ length: 7 }, (_, i) => (
             <span key={i} className="pb-1 text-[11px] text-muted-foreground">
-              {d}
+              {weekdayLabel((i + 1) % 7, locale)}
             </span>
           ))}
           {Array.from({ length: offset }, (_, i) => (

@@ -589,11 +589,18 @@ async function ensureUserInitialization(
   const client = existingClient || (await getSystemClient());
   try {
     if (!existingClient) await client.query('BEGIN');
-    await client.query(
+    const newProfile = await client.query(
       'INSERT INTO profiles (id, full_name, avatar_url, created_at, updated_at) ' +
         'SELECT $1, $2, $3, now(), now() WHERE NOT EXISTS (SELECT 1 FROM profiles WHERE id = $1)',
       [userId, fullName, avatarUrl]
     );
+    if (newProfile.rowCount === 1) {
+      // The profile trigger creates the preference row with the schema default.
+      await client.query(
+        'UPDATE user_preferences SET language = $2 WHERE user_id = $1',
+        [userId, 'zh-Hans']
+      );
+    }
     // Ensure user_goals exists (the base goal with NULL date)
     await client.query(
       'INSERT INTO user_goals (user_id, created_at, updated_at) ' +

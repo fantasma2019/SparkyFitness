@@ -468,7 +468,13 @@ export const PreferenceSettings = () => {
                     {t(
                       'settings.preferenceSettings.gPureAlcohol',
                       '{{label}} ({{grams}}g pure alcohol)',
-                      { label: preset.label, grams: preset.grams }
+                      {
+                        label: t(
+                          `settings.preferences.standardDrinkRegion.${preset.code}`,
+                          preset.label
+                        ),
+                        grams: preset.grams,
+                      }
                     )}
                   </SelectItem>
                 ))}

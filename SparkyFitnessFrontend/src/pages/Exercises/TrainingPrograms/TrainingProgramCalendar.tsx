@@ -18,11 +18,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { usePreferences } from '@/contexts/PreferencesContext';
-import {
-  formatDayLabel,
-  weekdayLabel,
-  workoutTitle,
-} from '@/utils/runPrograms';
+import { weekdayLabel } from '@/utils/languageUtils';
+import { formatDayLabel, workoutTitle } from '@/utils/runPrograms';
 
 /** Workouts listed before "Show all". */
 const PREVIEW_RUNS = 7;

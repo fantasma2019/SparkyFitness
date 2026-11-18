@@ -2,6 +2,7 @@ import type { TFunction } from 'i18next';
 import { findProgram, storedProgramStatus } from '@workspace/shared';
 import { translateForTest } from '@/tests/mocks/reactI18next';
 import { makeRunProgram } from '@/tests/mocks/runProgramFixture';
+import { weekdayLabel } from '@/utils/languageUtils';
 import {
   formatDayLabel,
   programDescription,
@@ -9,7 +10,6 @@ import {
   programStructure,
   programTitle,
   programWorkoutLabel,
-  weekdayLabel,
   workoutTitle,
 } from '@/utils/runPrograms';
 import { PROGRAM_COPY } from '@/constants/runProgramCopy';

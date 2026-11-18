@@ -33,6 +33,7 @@ function setup() {
     timezone: 'America/New_York',
     time_format: 'HH:mm',
     date_format: 'yyyy-MM-dd',
+    language: 'en',
     default_weight_unit: 'kg',
     default_measurement_unit: 'cm',
     default_distance_unit: 'km',

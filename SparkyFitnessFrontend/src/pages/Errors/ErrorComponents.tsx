@@ -49,22 +49,27 @@ export const RootErrorBoundary = () => {
       <div className="min-h-screen flex items-center justify-center bg-background p-4 text-center">
         <div className="max-w-md">
           <h1 className="text-4xl font-bold mb-4 text-foreground">
-            {UPDATE_TITLE}
+            {t('errors.errorComponents.updatingTitle', UPDATE_TITLE)}
           </h1>
-          <p className="text-xl text-muted-foreground">{UPDATE_MESSAGE}</p>
+          <p className="text-xl text-muted-foreground">
+            {t('errors.errorComponents.updatingMessage', UPDATE_MESSAGE)}
+          </p>
         </div>
       </div>
     );
   }
 
-  let title = 'Unknown Error';
-  let message = 'An unexpected error occurred.';
+  let title = t('errors.errorComponents.unknownError', 'Unknown Error');
+  let message = t(
+    'errors.errorComponents.unexpectedError',
+    'An unexpected error occurred.'
+  );
 
   if (isRouteErrorResponse(error)) {
     title = `${error.status} ${error.statusText}`;
     message = String(error.data);
   } else if (error instanceof Error) {
-    title = 'Error';
+    title = t('common.error', 'Error');
     message = error.message;
   }
 
@@ -96,22 +101,27 @@ export const RouteErrorBoundary = () => {
       <div className="flex flex-col items-center justify-center min-h-[50vh] bg-background p-6 text-center rounded-lg border border-border mt-4">
         <div className="max-w-md">
           <h2 className="text-2xl font-bold mb-3 text-foreground">
-            {UPDATE_TITLE}
+            {t('errors.errorComponents.updatingTitle', UPDATE_TITLE)}
           </h2>
-          <p className="text-muted-foreground">{UPDATE_MESSAGE}</p>
+          <p className="text-muted-foreground">
+            {t('errors.errorComponents.updatingMessage', UPDATE_MESSAGE)}
+          </p>
         </div>
       </div>
     );
   }
 
-  let title = 'Something went wrong';
-  let message = 'We are having trouble loading this section.';
+  let title = t('errors.errorComponents.sectionError', 'Something went wrong');
+  let message = t(
+    'errors.errorComponents.sectionUnavailable',
+    'We are having trouble loading this section.'
+  );
 
   if (isRouteErrorResponse(error)) {
     title = `${error.status} ${error.statusText}`;
     message = String(error.data);
   } else if (error instanceof Error) {
-    title = 'Error';
+    title = t('common.error', 'Error');
     message = error.message;
   }
 

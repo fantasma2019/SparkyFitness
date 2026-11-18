@@ -54,7 +54,6 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
-  const [passwordError, setPasswordError] = useState<string | null>(null);
   const { isToggled: showPassword, toggleHandler: passwordToggleHandler } =
     useToggle();
   // State for MFA challenge
@@ -75,7 +74,8 @@ const Auth = () => {
   const { mutateAsync: loginUser } = useLoginUserMutation();
   const { mutateAsync: demoLogin, isPending: isDemoLoginPending } =
     useDemoLoginMutation();
-  const { mutateAsync: registerUser } = useRegisterUserMutation();
+  const { mutateAsync: registerUser, isPending: isRegisterPending } =
+    useRegisterUserMutation();
   const { mutateAsync: requestMagicLink } = useRequestMagicLinkMutation();
   const { mutateAsync: initiateOidcLogin } = useInitiateOidcLoginMutation();
 
@@ -316,57 +316,28 @@ const Auth = () => {
     [loggingLevel, queryClient]
   );
 
-  const validatePassword = (pwd: string) => {
-    if (pwd.length < 8) {
-      return t('settings.accountSecurity.passwordLengthError');
-    }
-    if (!/[A-Z]/.test(pwd)) {
-      return 'Password must contain at least one uppercase letter.';
-    }
-    if (!/[a-z]/.test(pwd)) {
-      return 'Password must contain at least one lowercase letter.';
-    }
-    if (!/[0-9]/.test(pwd)) {
-      return 'Password must contain at least one number.';
-    }
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) {
-      return 'Password must contain at least one special character.';
-    }
-    return null; // No error
-  };
-
   const handleSignUp = async (e: React.SubmitEvent) => {
     e.preventDefault();
     info(loggingLevel, 'Auth: Attempting sign up.');
 
-    const validationError = validatePassword(password);
-    if (validationError) {
-      setPasswordError(validationError);
-      setLoading(false);
-      return;
-    } else {
-      setPasswordError(null);
+    try {
+      const data: AuthResponse = await registerUser({
+        email,
+        password,
+        fullName,
+      });
+      info(loggingLevel, 'Auth: Sign up successful.');
+      signIn(
+        data.userId,
+        data.userId,
+        email,
+        data.role || 'user',
+        true,
+        fullName
+      );
+    } catch (err: unknown) {
+      error(loggingLevel, 'Auth: Sign up failed:', err);
     }
-
-    setLoading(true);
-
-    const data: AuthResponse = await registerUser({
-      email,
-      password,
-      fullName,
-    });
-    info(loggingLevel, 'Auth: Sign up successful.');
-    signIn(
-      data.userId,
-      data.userId,
-      email,
-      data.role || 'user',
-      true,
-      fullName
-    );
-
-    setLoading(false);
-    debug(loggingLevel, 'Auth: Sign up loading state set to false.');
   };
 
   const handleRequestMagicLink = async (dialogEmail: string) => {
@@ -415,7 +386,10 @@ const Auth = () => {
       );
     } catch (err: unknown) {
       error(loggingLevel, 'Auth: Sign in failed:', err);
-      setFormError(getErrorMessage(err));
+      const message = getErrorMessage(err);
+      setFormError(
+        message === 'Invalid credentials.' ? t('auth.loginError') : message
+      );
     }
 
     setLoading(false);
@@ -759,30 +733,29 @@ const Auth = () => {
                                 'Auth: Sign Up password input changed.'
                               );
                               setPassword(e.target.value);
-                              setPasswordError(
-                                validatePassword(e.target.value)
-                              );
                             }}
                             required
                             minLength={8}
+                            aria-describedby="signup-password-hint"
                             autoComplete="new-password"
                           />
                           <PasswordToggle
                             showPassword={showPassword}
                             passwordToggleHandler={passwordToggleHandler}
                           />
-                          {passwordError && (
-                            <p className="text-red-500 text-sm">
-                              {passwordError}
-                            </p>
-                          )}
+                          <p
+                            id="signup-password-hint"
+                            className="text-sm text-muted-foreground"
+                          >
+                            {t('settings.accountSecurity.passwordLengthError')}
+                          </p>
                         </div>
                         <Button
                           type="submit"
                           className="w-full"
-                          disabled={loading || !!passwordError}
+                          disabled={isRegisterPending}
                         >
-                          {loading
+                          {isRegisterPending
                             ? t('auth.creatingAccount', 'Creating account...')
                             : t('auth.signUp', 'Sign Up')}
                         </Button>

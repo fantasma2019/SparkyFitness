@@ -86,6 +86,9 @@
     "noRecipes": "No recipes found.",
     "page": "Page {{page}}",
     "previewFailed": "The recipe could not be loaded. Try again.",
+    "tooManyIngredients": "This Mealie recipe has more than 100 ingredients. Split it into smaller recipes before importing.",
+    "providersFailed": "Could not load recipe providers. Try again.",
+    "searchFailed": "Could not load recipes. Try again.",
     "back": "Choose another recipe",
     "batchAmounts": "All ingredient quantities are for the whole recipe. Confirm every food, variant, quantity and unit before saving.",
     "sourceWarnings": "The source has incomplete or incompatible amounts, units or servings. Review the warnings below. Manual tracking corrections may prevent source sync.",
@@ -2158,6 +2161,14 @@
       "searchTimezones": "Search timezones...",
       "selectTimezone": "Select timezone...",
       "standardDrinkUnit": "Standard Drink Unit",
+      "standardDrinkRegion": {
+        "US": "United States",
+        "UK": "United Kingdom (1 unit)",
+        "AU": "Australia",
+        "EU": "Most of Europe",
+        "CA": "Canada",
+        "JP": "Japan"
+      },
       "weeklyAlcoholLimit": "Weekly Alcohol Limit (Standard Drinks)",
       "noWeeklyLimit": "No limit set",
       "caffeineHalfLife": "Caffeine Half-Life (Hours)",
@@ -7768,6 +7779,11 @@
   "i18n": {
     "locale": "en-US"
   },
+  "themeToggle": {
+    "light": "Light mode",
+    "dark": "Dark mode",
+    "system": "System theme"
+  },
   "integrations": {
     "corosLinkError": "Failed to link COROS account.",
     "corosLinkSuccess": "COROS account successfully linked!",
@@ -9984,7 +10000,13 @@
     },
     "errorComponents": {
       "returnToHome": "Return to Home",
-      "reloadPage": "Reload Page"
+      "reloadPage": "Reload Page",
+      "updatingTitle": "Updating SparkyFitness...",
+      "updatingMessage": "Loading the latest version.",
+      "unknownError": "Unknown Error",
+      "unexpectedError": "An unexpected error occurred.",
+      "sectionError": "Something went wrong",
+      "sectionUnavailable": "We are having trouble loading this section."
     },
     "notFound": {
       "oopsPageNotFoundOr": "Oops! Page not found or an unexpected error occurred.",

@@ -20,13 +20,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { weekdayLabel } from '@/utils/languageUtils';
 import {
   customWorkoutTitle,
   formatDayLabel,
   programDescription,
   programTitle,
   programWorkoutLabel,
-  weekdayLabel,
 } from '@/utils/runPrograms';
 
 /** A change older than this is history, not news. */

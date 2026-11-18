@@ -73,6 +73,19 @@ const dateLocales: Record<string, Locale> = {
   'zh-Hant': zhTW,
 };
 
+export const DEFAULT_WEB_LANGUAGE = 'zh-Hans';
+
+/** Formats a weekday where 0 is Sunday. January 7, 2024 was a Sunday. */
+export const weekdayLabel = (
+  day: number,
+  locale: string,
+  style: 'short' | 'long' = 'short'
+): string =>
+  new Date(Date.UTC(2024, 0, 7 + day)).toLocaleDateString(locale, {
+    weekday: style,
+    timeZone: 'UTC',
+  });
+
 export const getDateLocale = (language: string): Locale => {
   const baseLanguage = language.split('-')[0];
   return (

@@ -16,7 +16,6 @@ import { debug, info } from '@/utils/logging';
 import useToggle from '@/hooks/use-toggle';
 import PasswordToggle from '@/components/PasswordToggle';
 import { useResetPasswordMutation } from '@/hooks/Auth/useAuth';
-import { getErrorMessage } from '@/utils/api';
 import { useTranslation } from 'react-i18next';
 
 const ResetPassword = () => {
@@ -30,81 +29,40 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [passwordError, setPasswordError] = useState<string | null>(null);
   const { isToggled: showPassword, toggleHandler: passwordToggleHandler } =
     useToggle();
   const { mutateAsync: resetPassword } = useResetPasswordMutation();
 
   const token = searchParams.get('token');
+  const passwordsMatch = newPassword === confirmPassword;
+  const missingTokenMessage = t(
+    'auth.resetPassword.invalidOrMissingPasswordReset',
+    'Invalid or missing password reset token.'
+  );
 
   useEffect(() => {
     if (!token) {
-      setMessage('Invalid or missing password reset token.');
+      setMessage(missingTokenMessage);
       toast({
         title: t('common.error', 'Error'),
-        description: t(
-          'auth.resetPassword.invalidOrMissingPasswordReset',
-          'Invalid or missing password reset token.'
-        ),
+        description: missingTokenMessage,
         variant: 'destructive',
       });
     }
-  }, [token, t]);
-
-  const validatePassword = (pwd: string) => {
-    if (pwd.length < 8) {
-      return t('settings.accountSecurity.passwordLengthError');
-    }
-    if (!/[A-Z]/.test(pwd)) {
-      return 'Password must contain at least one uppercase letter.';
-    }
-    if (!/[a-z]/.test(pwd)) {
-      return 'Password must contain at least one lowercase letter.';
-    }
-    if (!/[0-9]/.test(pwd)) {
-      return 'Password must contain at least one number.';
-    }
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(pwd)) {
-      return 'Password must contain at least one special character.';
-    }
-    return null; // No error
-  };
+  }, [token, t, missingTokenMessage]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!token || !passwordsMatch) return;
     info(loggingLevel, 'ResetPassword: Attempting to reset password.');
     setLoading(true);
     setMessage('');
-    setPasswordError(null);
-
-    if (!token) {
-      setMessage('Invalid or missing password reset token.');
-      setLoading(false);
-      return;
-    }
-
-    const validationError = validatePassword(newPassword);
-    if (validationError) {
-      setPasswordError(validationError);
-      setLoading(false);
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setPasswordError('Passwords do not match.');
-      setLoading(false);
-      return;
-    }
 
     try {
       await resetPassword({ token, newPassword });
-      setMessage(
-        'Your password has been reset successfully. You can now sign in with your new password.'
-      );
       navigate('/'); // Redirect to root
-    } catch (err: unknown) {
-      const message = getErrorMessage(err);
-      setMessage(message || 'An unexpected error occurred.');
+    } catch {
+      setMessage(t('auth.passwordResetError'));
     } finally {
       setLoading(false);
     }
@@ -148,21 +106,22 @@ const ResetPassword = () => {
                   'Enter new password'
                 )}
                 value={newPassword}
-                onChange={(e) => {
-                  setNewPassword(e.target.value);
-                  setPasswordError(validatePassword(e.target.value));
-                }}
+                onChange={(e) => setNewPassword(e.target.value)}
                 required
                 minLength={8}
+                aria-describedby="reset-password-hint"
                 autoComplete="new-password"
               />
               <PasswordToggle
                 showPassword={showPassword}
                 passwordToggleHandler={passwordToggleHandler}
               />
-              {passwordError && (
-                <p className="text-red-500 text-sm">{passwordError}</p>
-              )}
+              <p
+                id="reset-password-hint"
+                className="text-sm text-muted-foreground"
+              >
+                {t('settings.accountSecurity.passwordLengthError')}
+              </p>
             </div>
             <div className="space-y-2 relative">
               <Label htmlFor="confirm-password">
@@ -187,13 +146,16 @@ const ResetPassword = () => {
                 showPassword={showPassword}
                 passwordToggleHandler={passwordToggleHandler}
               />
+              {confirmPassword && !passwordsMatch && (
+                <p className="text-red-500 text-sm">
+                  {t('settings.accountSecurity.newPasswordsDoNotMatch')}
+                </p>
+              )}
             </div>
             <Button
               type="submit"
               className="w-full"
-              disabled={
-                loading || !!passwordError || newPassword !== confirmPassword
-              }
+              disabled={loading || !token || !passwordsMatch}
             >
               {loading
                 ? t('auth.resetPassword.resetting', 'Resetting...')
